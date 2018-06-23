@@ -3,6 +3,8 @@ package com.paulobsa.popularmovies;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -20,30 +22,29 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class MainActivity extends Activity {
+public class FilmListActivity extends Activity  {
 
     private RequestQueue mRequestQueue;
     private String LOG_TAG = "POPULAR_MOVIES";
-    Button refreshBtn;
     private ArrayList<String> listaFilmes = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        refreshBtn = findViewById(R.id.button);
 
         mRequestQueue = Volley.newRequestQueue(this);
-
-        refreshBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fetchTopRated();
-            }
-        });
-
         fetchTopRated();
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (R.id.action_refresh == id) {
+            fetchTopRated();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void fetchMostPopular(){
@@ -52,6 +53,12 @@ public class MainActivity extends Activity {
 
     private void fetchTopRated(){
         fetchFilms(Util.buildTopRatedMoviesURL().toString());
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_itens, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     private void fetchFilms(String query){
@@ -72,7 +79,7 @@ public class MainActivity extends Activity {
                             }
 
                             //set film list
-
+                            Toast.makeText(getApplicationContext(), "OK", Toast.LENGTH_LONG).show();
 
                         } catch (JSONException e) {
                             e.printStackTrace();
