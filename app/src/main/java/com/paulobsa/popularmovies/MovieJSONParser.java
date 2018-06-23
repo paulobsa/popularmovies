@@ -20,7 +20,7 @@ public class MovieJSONParser {
     }
 
     public String getPosterPath() throws JSONException {
-        return IMAGE_ROOT + SMALL_SIZE + mJson.getString("poster_path");
+        return IMAGE_ROOT + BIG_SIZE + mJson.getString("poster_path");
     }
 
     public String getBackDropPath() throws JSONException {

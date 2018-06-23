@@ -1,6 +1,8 @@
 package com.paulobsa.popularmovies;
 
+import android.content.Context;
 import android.net.Uri;
+import android.util.DisplayMetrics;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -39,5 +41,11 @@ public class Util {
         }
 
         return url;
+    }
+
+    public static int getColumnSize(Context context) {
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+        return (int) (dpWidth / 160);
     }
 }

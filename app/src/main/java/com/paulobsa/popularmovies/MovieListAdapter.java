@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
@@ -53,6 +54,8 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Movi
             });
 
             Picasso.get().load(moviesJsonParser.getPosterPath()).into(holder.mImageView);
+            holder.textView.setText(moviesJsonParser.getTitle());
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -66,10 +69,13 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Movi
     static class MovieAdapterHolder extends RecyclerView.ViewHolder {
         ImageView mImageView;
         CardView mCard;
+        TextView textView;
+
         public MovieAdapterHolder(View itemView) {
             super(itemView);
             this.mCard = itemView.findViewById(R.id.movie_card);
             this.mImageView = itemView.findViewById(R.id.img_movie_poster);
+            this.textView = itemView.findViewById(R.id.card_view_movie_title);
         }
     }
 

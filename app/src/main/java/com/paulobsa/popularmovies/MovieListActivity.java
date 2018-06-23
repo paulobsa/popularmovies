@@ -41,7 +41,8 @@ public class MovieListActivity extends Activity implements MovieListAdapter.Movi
         mAdapter = new MovieListAdapter(this, this);
         mRecyclerView.setAdapter(mAdapter);
 
-        GridLayoutManager manager = new GridLayoutManager(this, 2);
+
+        GridLayoutManager manager = new GridLayoutManager(this, Util.getColumnSize(context));
 
         mRecyclerView.setLayoutManager(manager);
 
