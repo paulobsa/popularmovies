@@ -1,12 +1,12 @@
 package com.paulobsa.popularmovies;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -22,16 +22,28 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class FilmListActivity extends Activity  {
+public class MovieListActivity extends Activity implements MovieListAdapter.MovieAdapterOnclickHandler {
 
     private RequestQueue mRequestQueue;
     private String LOG_TAG = "POPULAR_MOVIES";
-    private ArrayList<String> listaFilmes = new ArrayList<>();
+    private ArrayList<String> moviesList = new ArrayList<>();
+    private RecyclerView mRecyclerView;
+    private MovieListAdapter mAdapter;
+    private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.movie_list_activity);
+        context = this;
+
+        mRecyclerView = findViewById(R.id.movie_recycler_view);
+        mAdapter = new MovieListAdapter(this, this);
+        mRecyclerView.setAdapter(mAdapter);
+
+        GridLayoutManager manager = new GridLayoutManager(this, 2);
+
+        mRecyclerView.setLayoutManager(manager);
 
         mRequestQueue = Volley.newRequestQueue(this);
         fetchTopRated();
@@ -41,8 +53,10 @@ public class FilmListActivity extends Activity  {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (R.id.action_refresh == id) {
+        if (R.id.top_rated == id) {
             fetchTopRated();
+        } else if (R.id.most_popular == id) {
+            fetchMostPopular();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -63,7 +77,7 @@ public class FilmListActivity extends Activity  {
 
     private void fetchFilms(String query){
 
-        listaFilmes.clear();
+        moviesList.clear();
 
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
                 (Request.Method.GET, query, null, new Response.Listener<JSONObject>() {
@@ -75,11 +89,13 @@ public class FilmListActivity extends Activity  {
                             JSONArray itens = response.getJSONArray("results");
 
                             for(int i = 0; i < itens.length(); i++){
-                                listaFilmes.add(itens.getJSONObject(i).toString());
+                                moviesList.add(itens.getJSONObject(i).toString());
                             }
 
                             //set film list
-                            Toast.makeText(getApplicationContext(), "OK", Toast.LENGTH_LONG).show();
+                            Toast.makeText(context, "OK", Toast.LENGTH_LONG).show();
+                            mAdapter.setMoviesList(moviesList);
+                            mAdapter.notifyDataSetChanged();
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -89,10 +105,15 @@ public class FilmListActivity extends Activity  {
 
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(), R.string.no_connection, Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, R.string.no_connection, Toast.LENGTH_LONG).show();
                     }
                 });
 
         mRequestQueue.add(jsObjRequest);
+    }
+
+    @Override
+    public void onCardClick(String jsonFilme) {
+        Toast.makeText(context, "Card Click", Toast.LENGTH_LONG).show();
     }
 }
