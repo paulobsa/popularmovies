@@ -80,7 +80,7 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Movi
     }
 
     public interface MovieAdapterOnclickHandler{
-        void onCardClick(String jsonFilme);
+        void onCardClick(String movieJson);
     }
 
     public void setMoviesList(ArrayList<String> moviesList) {

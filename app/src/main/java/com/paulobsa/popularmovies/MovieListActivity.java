@@ -2,6 +2,7 @@ package com.paulobsa.popularmovies;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -25,11 +26,12 @@ import java.util.ArrayList;
 public class MovieListActivity extends Activity implements MovieListAdapter.MovieAdapterOnclickHandler {
 
     private RequestQueue mRequestQueue;
-    private String LOG_TAG = "POPULAR_MOVIES";
-    private ArrayList<String> moviesList = new ArrayList<>();
     private RecyclerView mRecyclerView;
     private MovieListAdapter mAdapter;
     private Context context;
+    private static String LOG_TAG = "POPULAR_MOVIES";
+    private static String MOVIES_LIST = "movies_list";
+    private ArrayList<String> moviesList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,13 +43,17 @@ public class MovieListActivity extends Activity implements MovieListAdapter.Movi
         mAdapter = new MovieListAdapter(this, this);
         mRecyclerView.setAdapter(mAdapter);
 
-
         GridLayoutManager manager = new GridLayoutManager(this, Util.getColumnSize(context));
-
         mRecyclerView.setLayoutManager(manager);
 
         mRequestQueue = Volley.newRequestQueue(this);
-        fetchTopRated();
+
+        if (savedInstanceState == null) {
+            fetchTopRated();
+        } else {
+            moviesList = (ArrayList<String>) savedInstanceState.getSerializable(MOVIES_LIST);
+            updateMoviesList();
+        }
 
     }
 
@@ -60,6 +66,12 @@ public class MovieListActivity extends Activity implements MovieListAdapter.Movi
             fetchMostPopular();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable(MOVIES_LIST, moviesList);
     }
 
     private void fetchMostPopular(){
@@ -78,8 +90,6 @@ public class MovieListActivity extends Activity implements MovieListAdapter.Movi
 
     private void fetchFilms(String query){
 
-        moviesList.clear();
-
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
                 (Request.Method.GET, query, null, new Response.Listener<JSONObject>() {
 
@@ -95,8 +105,7 @@ public class MovieListActivity extends Activity implements MovieListAdapter.Movi
 
                             //set film list
                             Toast.makeText(context, "OK", Toast.LENGTH_LONG).show();
-                            mAdapter.setMoviesList(moviesList);
-                            mAdapter.notifyDataSetChanged();
+                            updateMoviesList();
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -113,8 +122,16 @@ public class MovieListActivity extends Activity implements MovieListAdapter.Movi
         mRequestQueue.add(jsObjRequest);
     }
 
+    private void updateMoviesList() {
+        mAdapter.setMoviesList(moviesList);
+        mAdapter.notifyDataSetChanged();
+    }
+
     @Override
-    public void onCardClick(String jsonFilme) {
+    public void onCardClick(String movieJson) {
         Toast.makeText(context, "Card Click", Toast.LENGTH_LONG).show();
+        Intent i = new Intent(this, MovieDetailActivity.class);
+        i.putExtra(MovieDetailActivity.MOVIE_JSON, movieJson);
+        startActivity(i);
     }
 }
